@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Café Literario — Donde cada taza tiene un capítulo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#241B14;
+    --ink-2:#18110C;
+    --ink-3:#3A2B1F;
+    --parchment:#F4E7D2;
+    --parchment-2:#EBD9BB;
+    --brass:#DDBB8C;
+    --brass-light:#EAD3A8;
+    --rust:#8B4A2E;
+    --sage:#B9793A;
+    --charcoal:#251C15;
+    --line:rgba(221,187,140,0.35);
+
+    --font-display:'Fraunces', serif;
+    --font-body:'Literata', serif;
+    --font-mono:'Space Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--charcoal);
+    font-family:var(--font-body);
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; }
+  img{ max-width:100%; display:block; }
+
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--rust);
+  }
+  .eyebrow.on-dark{ color:var(--brass-light); }
+
+  h1,h2,h3{
+    font-family:var(--font-display);
+    font-weight:600;
+    margin:0;
+    color:inherit;
+  }
+
+  /* ---------- Top mark ---------- */
+  .top-mark{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px clamp(20px,5vw,56px);
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink);
+    background:rgba(244,231,210,0.88);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-mark span:last-child{ opacity:0.75; }
+  .brand-mark{ display:flex; align-items:center; gap:8px; }
+  .brand-mark img{
+    width:22px; height:22px;
+    border-radius:50%;
+    object-fit:cover;
+    filter:none;
+  }
+
+  /* ---------- HERO / BOOKSHELF ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    background:
+      linear-gradient(180deg, rgba(24,17,12,0.55) 0%, rgba(24,17,12,0.88) 55%, var(--ink-2) 100%),
+      url('img/ambiente-lectura.jpg');
+    background-size:cover;
+    background-position:center 30%;
+    color:var(--parchment);
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    overflow:hidden;
+    padding-top:80px;
+  }
+
+  .hero-copy{
+    padding:0 clamp(20px,5vw,56px);
+    max-width:820px;
+  }
+  .hero-copy .eyebrow{ margin-bottom:18px; opacity:0; animation:rise 0.8s ease forwards 0.1s; }
+  .hero-title{
+    font-size:clamp(2.4rem, 6vw, 4.6rem);
+    line-height:1.02;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    opacity:0;
+    animation:rise 0.9s ease forwards 0.25s;
+  }
+  .hero-title em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--brass-light);
+  }
+  .hero-sub{
+    font-family:var(--font-body);
+    font-size:1.08rem;
+    max-width:52ch;
+    color:var(--parchment-2);
+    margin-top:22px;
+    opacity:0;
+    animation:rise 0.9s ease forwards 0.4s;
+  }
+
+  @keyframes rise{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* the shelf itself acts as primary navigation */
+  .shelf-wrap{
+    margin-top:56px;
+    padding:0 clamp(20px,5vw,56px);
+    opacity:0;
+    animation:rise 1s ease forwards 0.55s;
+  }
+  .shelf-label{
+    font-family:var(--font-mono);
+    font-size:0.68rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--parchment-2);
+    opacity:0.6;
+    margin-bottom:10px;
+  }
+  .shelf{
+    display:flex;
+    align-items:flex-end;
+    gap:3px;
+    border-bottom:10px solid var(--brass);
+    padding-bottom:0;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .shelf::-webkit-scrollbar{ display:none; }
+
+  .spine{
+    position:relative;
+    flex:0 0 auto;
+    width:64px;
+    height:220px;
+    border-radius:5px 5px 0 0;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding-top:22px;
+    cursor:pointer;
+    text-decoration:none;
+    color:var(--parchment);
+    transition:transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s ease;
+    box-shadow:inset -6px 0 10px rgba(0,0,0,0.18), inset 6px 0 10px rgba(255,255,255,0.05);
+  }
+  .spine:nth-child(1){ background:var(--rust); height:220px; }
+  .spine:nth-child(2){ background:var(--sage); height:196px; }
+  .spine:nth-child(3){ background:var(--brass); height:236px; }
+  .spine:nth-child(4){ background:#5A4A6B; height:206px; }
+  .spine:nth-child(5){ background:#3E5C6B; height:214px; }
+
+  .spine:hover, .spine:focus-visible{
+    transform:translateY(-18px);
+    box-shadow:0 18px 30px rgba(0,0,0,0.35), inset -6px 0 10px rgba(0,0,0,0.18);
+    outline:none;
+  }
+  .spine-text{
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+
+  .hero-scroll-hint{
+    padding:14px clamp(20px,5vw,56px) 26px;
+    font-family:var(--font-mono);
+    font-size:0.68rem;
+    color:var(--parchment-2);
+    opacity:0.55;
+  }
+
+  /* ---------- Section shell ---------- */
+  section{
+    padding:96px clamp(20px,5vw,56px);
+    position:relative;
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    margin-bottom:48px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px;
+  }
+  .section-head h2{
+    font-size:clamp(1.8rem,3.2vw,2.6rem);
+  }
+
+  .reveal{
+    opacity:0;
+    transform:translateY(24px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  /* ---------- Historia: open book spread ---------- */
+  .spread{
+    background:var(--parchment-2);
+    border-radius:4px;
+    box-shadow:0 1px 0 var(--line), 0 40px 60px -40px rgba(36,31,26,0.25);
+    display:grid;
+    grid-template-columns:1fr 1px 1fr;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .spread-gutter{
+    background:linear-gradient(90deg, transparent, rgba(36,31,26,0.18), transparent);
+  }
+  .page{
+    padding:clamp(28px,4vw,56px);
+  }
+  .page p{ margin:0 0 16px; color:var(--charcoal); }
+  .page-chapter{
+    font-family:var(--font-mono);
+    font-size:0.68rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--rust);
+    margin-bottom:10px;
+    display:block;
+  }
+  .page h3{ font-size:1.7rem; margin-bottom:18px; }
+
+  .timeline{
+    list-style:none;
+    margin:0; padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .timeline li{
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:16px;
+    align-items:start;
+  }
+  .timeline .year{
+    font-family:var(--font-mono);
+    font-weight:700;
+    color:var(--sage);
+    font-size:0.95rem;
+    padding-top:2px;
+  }
+  .timeline .desc{ color:var(--charcoal); font-size:0.96rem; }
+  .timeline .desc strong{ display:block; font-family:var(--font-display); font-weight:600; font-size:1.05rem; margin-bottom:2px; }
+
+  @media (max-width:780px){
+    .spread{ grid-template-columns:1fr; }
+    .spread-gutter{ display:none; }
+  }
+
+  /* ---------- Valores: bookmarks ---------- */
+  .bookmarks{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:26px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .bookmark{
+    background:var(--ink);
+    color:var(--parchment);
+    padding:32px 26px 40px;
+    position:relative;
+    clip-path:polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
+    min-height:230px;
+  }
+  .bookmark:nth-child(2){ background:var(--rust); }
+  .bookmark:nth-child(3){ background:var(--ink-3); }
+  .bookmark .eyebrow{ margin-bottom:14px; }
+  .bookmark p{ font-size:0.94rem; color:var(--parchment-2); margin:0; }
+
+  .values-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:28px;
+    max-width:1180px;
+    margin-left:auto; margin-right:auto;
+  }
+  .value-tag{
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+    border:1px solid var(--brass);
+    color:var(--rust);
+    padding:8px 16px;
+    border-radius:999px;
+  }
+
+  /* ---------- Menu: table of contents ---------- */
+  .menu-wrap{
+    max-width:920px;
+    margin:0 auto;
+  }
+  .menu-cat{ margin-bottom:52px; }
+  .menu-cat-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .menu-cat-icon{
+    flex:0 0 auto;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:var(--parchment-2);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px;
+  }
+  .menu-cat-icon svg{ width:100%; height:100%; }
+  .menu-cat-head .menu-cat-title{ margin:0; }
+  .menu-cat-title{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:1.4rem;
+    color:var(--rust);
+    margin-bottom:22px;
+  }
+  .menu-item{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:12px 0;
+    border-bottom:1px dotted rgba(36,31,26,0.2);
+  }
+  .menu-item:first-of-type{ border-top:1px dotted rgba(36,31,26,0.2); }
+  .menu-item .name{
+    font-family:var(--font-body);
+    font-weight:500;
+    font-size:1.02rem;
+    white-space:nowrap;
+  }
+  .menu-item .desc{
+    font-size:0.85rem;
+    color:#6b6055;
+    white-space:nowrap;
+    overflow:hidden;
+  }
+  .menu-item .leader{
+    flex:1;
+    border-bottom:2px dotted rgba(139,58,45,0.35);
+    transform:translateY(-5px);
+    min-width:20px;
+  }
+  .menu-item .price{
+    font-family:var(--font-mono);
+    font-weight:700;
+    color:var(--ink);
+    font-size:0.98rem;
+    white-space:nowrap;
+  }
+  @media (max-width:600px){
+    .menu-item{ flex-wrap:wrap; }
+    .menu-item .desc{ flex-basis:100%; white-space:normal; order:3; }
+    .menu-item .leader{ display:none; }
+  }
+
+  /* ---------- Ambiente: gallery ---------- */
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:22px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .gallery-card{
+    aspect-ratio:4/5;
+    border-radius:3px;
+    position:relative;
+    padding:18px;
+    display:flex;
+    align-items:flex-end;
+    overflow:hidden;
+    color:var(--parchment);
+    box-shadow:0 20px 40px -20px rgba(36,31,26,0.35);
+  }
+  .gallery-card img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+  }
+  .gallery-card::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(24,17,12,0) 45%, rgba(24,17,12,0.75) 100%);
+  }
+  .gallery-card::before{
+    content:"";
+    position:absolute; inset:0;
+    opacity:0.9;
+  }
+  .gallery-card.photo::before{ content:none; }
+  .gallery-card span{ z-index:1; }
+  .gallery-card:nth-child(1){ background:linear-gradient(155deg,#3A2B1F,#18110C); }
+  .gallery-card:nth-child(4){ background:linear-gradient(155deg,#5A4A6B,#241e33); }
+  .gallery-card span{
+    position:relative;
+    font-family:var(--font-mono);
+    font-size:0.76rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
+  /* ---------- Footer / colophon ---------- */
+  footer{
+    background:var(--ink);
+    color:var(--parchment-2);
+    padding:80px clamp(20px,5vw,56px) 40px;
+  }
+  .colophon{
+    max-width:1180px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:1.3fr 1fr 1fr;
+    gap:40px;
+    padding-bottom:48px;
+    border-bottom:1px solid rgba(178,148,102,0.25);
+  }
+  .colophon h3{
+    font-family:var(--font-display);
+    font-size:1.5rem;
+    color:var(--parchment);
+    margin-bottom:14px;
+  }
+  .colophon p, .colophon address{
+    font-style:normal;
+    font-size:0.92rem;
+    color:var(--parchment-2);
+    opacity:0.85;
+    line-height:1.7;
+    margin:0 0 8px;
+  }
+  .colophon a{ text-decoration:underline; text-decoration-color:var(--brass); text-underline-offset:3px; }
+  .col-label{
+    font-family:var(--font-mono);
+    font-size:0.68rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--brass-light);
+    margin-bottom:12px;
+    display:block;
+  }
+  .imprint{
+    max-width:1180px;
+    margin:32px auto 0;
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    color:var(--parchment-2);
+    opacity:0.55;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  @media (max-width:780px){
+    .colophon{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-mark">
+  <span class="brand-mark"><img src="C:\Users\USER16\Downloads\WhatsApp Image 2026-07-16 at 4.59.51 PM.jpeg" alt="Café Literario"> Café Literario</span>
+  <span>Chupaca · Huancayo — Junín, Perú</span>
+</div>
+
+<!-- ============ HERO / BOOKSHELF NAV ============ -->
+<header class="hero" id="inicio">
+  <div class="hero-copy">
+    <p class="eyebrow on-dark">Café de autor &amp; librería de barrio</p>
+    <h1 class="hero-title">Donde cada taza<br>tiene un <em>capítulo</em>.</h1>
+    <p class="hero-sub">Un rincón en Chupaca donde el café recién molido y las páginas usadas comparten mesa. Ven a leer, a conversar o a perderte un rato entre estantes.</p>
+  </div>
+
+  <div class="shelf-wrap">
+    <p class="shelf-label">Explora el estante</p>
+    <nav class="shelf" aria-label="Navegación principal">
+      <a class="spine" href="#historia"><span class="spine-text">La Casa</span></a>
+      <a class="spine" href="#valores"><span class="spine-text">Valores</span></a>
+      <a class="spine" href="#carta"><span class="spine-text">La Carta</span></a>
+      <a class="spine" href="#ambiente"><span class="spine-text">El Rincón</span></a>
+      <a class="spine" href="#visitanos"><span class="spine-text">Visítanos</span></a>
+    </nav>
+  </div>
+  <p class="hero-scroll-hint">↓ jala un lomo para abrir el capítulo</p>
+</header>
+
+<!-- ============ HISTORIA ============ -->
+<section id="historia">
+  <div class="section-head reveal">
+    <h2>Nuestra historia</h2>
+  </div>
+
+  <div class="spread reveal">
+    <div class="page">
+      <span class="page-chapter">Capítulo I</span>
+      <h3>Cómo empezó todo</h3>
+      <p>Café Literario nació de una biblioteca personal que se quedó pequeña. Lo que empezó como un estante compartido con vecinos de Chupaca, con café pasado en casa y sillas prestadas, se convirtió en un lugar de encuentro para quienes no tenían dónde leer con calma ni con quién conversar de libros.</p>
+      <p>Hoy seguimos con esa misma idea: un espacio pequeño, cuidado a mano, donde el menú cambia según la cosecha y la carta de lecturas cambia según quién la deja prestada. No somos una cadena ni queremos serlo — somos el estante de la cuadra.</p>
+    </div>
+    <div class="spread-gutter"></div>
+    <div class="page">
+      <span class="page-chapter">Capítulo II</span>
+      <h3>Línea de tiempo</h3>
+      <ul class="timeline">
+        <li><span class="year">2019</span><span class="desc"><strong>La idea</strong>Un estante de 40 libros abierto a los vecinos los fines de semana.</span></li>
+        <li><span class="year">2021</span><span class="desc"><strong>Apertura</strong>Café Literario abre sus puertas en Chupaca con barra de café y estantería viajera.</span></li>
+        <li><span class="year">2023</span><span class="desc"><strong>Sala de lectura</strong>Ampliamos con un segundo ambiente dedicado solo a la lectura silenciosa.</span></li>
+        <li><span class="year">2025</span><span class="desc"><strong>Club de lectura</strong>Nace el círculo mensual de lectura con autores de la región de Junín.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MISIÓN / VISIÓN / VALORES ============ -->
+<section id="valores" style="background:var(--parchment-2)">
+  <div class="section-head reveal">
+    <h2>Misión, visión y valores</h2>
+  </div>
+
+  <div class="bookmarks reveal">
+    <div class="bookmark">
+      <p class="eyebrow on-dark">Misión</p>
+      <p>Ofrecer un espacio íntimo en Chupaca donde el buen café y la lectura compartida acerquen a las personas, sin prisa y sin pantallas de por medio.</p>
+    </div>
+    <div class="bookmark">
+      <p class="eyebrow on-dark">Visión</p>
+      <p>Ser, hacia el 2028, un referente cultural de la región Junín: el lugar al que se recomienda ir cuando alguien busca un café honesto y una comunidad lectora activa.</p>
+    </div>
+    <div class="bookmark">
+      <p class="eyebrow on-dark">Eslogan</p>
+      <p style="font-family:var(--font-display); font-style:italic; font-size:1.3rem; color:var(--parchment);">"Sírvete una historia."</p>
+    </div>
+  </div>
+
+  <div class="values-tags reveal">
+    <span class="value-tag">Autenticidad</span>
+    <span class="value-tag">Comunidad</span>
+    <span class="value-tag">Calidez</span>
+    <span class="value-tag">Curiosidad</span>
+    <span class="value-tag">Sostenibilidad</span>
+  </div>
+</section>
+
+<!-- ============ CARTA / MENÚ ============ -->
+<section id="carta">
+  <div class="section-head reveal">
+    <h2>La carta</h2>
+  </div>
+
+  <div class="menu-wrap reveal">
+    <div class="menu-cat">
+      <div class="menu-cat-head">
+        <span class="menu-cat-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 40c0 7.7 6.3 14 14 14h6c7.7 0 14-6.3 14-14V26H14v14z" fill="#EBD9BB"/>
+            <path d="M14 40c0 7.7 6.3 14 14 14h6c7.7 0 14-6.3 14-14V26H14v14z" stroke="#8B4A2E" stroke-width="2"/>
+            <path d="M48 28h4a6 6 0 010 12h-3" stroke="#8B4A2E" stroke-width="2" stroke-linecap="round"/>
+            <path d="M22 20c-1.5-2 1.5-3-.5-6M31 20c-1.5-2 1.5-3-.5-6M40 20c-1.5-2 1.5-3-.5-6" stroke="#B9793A" stroke-width="2" stroke-linecap="round"/>
+            <line x1="10" y1="54" x2="54" y2="54" stroke="#8B4A2E" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <p class="menu-cat-title">Cafés de autor</p>
+      </div>
+      <div class="menu-item"><span class="name">Americano de la casa</span><span class="leader"></span><span class="price">S/ 7.00</span></div>
+      <div class="menu-item"><span class="name">Cappuccino Chupaca</span><span class="desc">canela y leche local</span><span class="leader"></span><span class="price">S/ 10.00</span></div>
+      <div class="menu-item"><span class="name">Flat white de temporada</span><span class="leader"></span><span class="price">S/ 11.00</span></div>
+      <div class="menu-item"><span class="name">Filtrado V60</span><span class="desc">grano de Satipo</span><span class="leader"></span><span class="price">S/ 12.00</span></div>
+    </div>
+
+    <div class="menu-cat">
+      <div class="menu-cat-head">
+        <span class="menu-cat-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 34c0-8 9.9-16 22-16s22 8 22 16H10z" fill="#EBD9BB" stroke="#8B4A2E" stroke-width="2"/>
+            <path d="M10 34h44v4c0 1.1-.9 2-2 2H12c-1.1 0-2-.9-2-2v-4z" fill="#B9793A" stroke="#8B4A2E" stroke-width="2"/>
+            <circle cx="24" cy="26" r="2" fill="#8B4A2E"/>
+            <circle cx="34" cy="23" r="2" fill="#8B4A2E"/>
+            <circle cx="42" cy="27" r="2" fill="#8B4A2E"/>
+          </svg>
+        </span>
+        <p class="menu-cat-title">Repostería de biblioteca</p>
+      </div>
+      <div class="menu-item"><span class="name">Alfajor de manjar</span><span class="leader"></span><span class="price">S/ 5.00</span></div>
+      <div class="menu-item"><span class="name">Queque de naranja</span><span class="leader"></span><span class="price">S/ 8.00</span></div>
+      <div class="menu-item"><span class="name">Brownie con nuez</span><span class="leader"></span><span class="price">S/ 9.00</span></div>
+    </div>
+
+    <div class="menu-cat">
+      <div class="menu-cat-head">
+        <span class="menu-cat-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="32" cy="34" rx="24" ry="8" fill="#EBD9BB" stroke="#8B4A2E" stroke-width="2"/>
+            <path d="M8 34v6c0 4.4 10.7 8 24 8s24-3.6 24-8v-6" stroke="#8B4A2E" stroke-width="2" fill="none"/>
+            <circle cx="24" cy="33" r="3" fill="#B9793A"/>
+            <circle cx="34" cy="35" r="2.5" fill="#8B4A2E"/>
+            <circle cx="42" cy="32" r="2" fill="#B9793A"/>
+          </svg>
+        </span>
+        <p class="menu-cat-title">Para compartir</p>
+      </div>
+      <div class="menu-item"><span class="name">Tabla de quesos andinos</span><span class="leader"></span><span class="price">S/ 22.00</span></div>
+      <div class="menu-item"><span class="name">Sánguche de pollo deshilachado</span><span class="leader"></span><span class="price">S/ 15.00</span></div>
+    </div>
+
+    <div class="menu-cat">
+      <div class="menu-cat-head">
+        <span class="menu-cat-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 12h24l-3 40a4 4 0 01-4 4H27a4 4 0 01-4-4l-3-40z" fill="#EBD9BB" stroke="#8B4A2E" stroke-width="2"/>
+            <line x1="18" y1="12" x2="46" y2="12" stroke="#8B4A2E" stroke-width="2" stroke-linecap="round"/>
+            <path d="M23 24h18M24 32h16M25 40h14" stroke="#B9793A" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <p class="menu-cat-title">Bebidas frías</p>
+      </div>
+      <div class="menu-item"><span class="name">Limonada de hierbaluisa</span><span class="leader"></span><span class="price">S/ 8.00</span></div>
+      <div class="menu-item"><span class="name">Cold brew</span><span class="leader"></span><span class="price">S/ 10.00</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AMBIENTE / GALERÍA ============ -->
+<section id="ambiente" style="background:var(--parchment-2)">
+  <div class="section-head reveal">
+    <h2>El rincón</h2>
+  </div>
+  <div class="gallery reveal">
+    <div class="gallery-card photo"><img src="C:\Users\USER16\Downloads\WhatsApp Image 2026-07-16 at 5.10.27 PM (1).jpeg" alt="Terraza al aire libre en Café Literario"><span>Terraza</span></div>
+    <div class="gallery-card photo"><img src="C:\Users\USER16\Downloads\WhatsApp Image 2026-07-21 at 3.51.22 PM.jpeg" alt="Terraza al aire libre en Café Literario"><span>sala de lectura</span></div>
+    <div class="gallery-card photo"><img src="C:\Users\USER16\Downloads\WhatsApp Image 2026-07-16 at 5.14.57 PM.jpeg" alt="Estantería de libros junto a mesa con café en Café Literario"><span>Estantería viajera</span></div>
+    <div class="gallery-card photo"><img src="C:\Users\USER16\Downloads\WhatsApp Image 2026-07-16 at 5.14.57 PM (1).jpeg" alt="Estantería de libros para niños en Café Literario"><span>Rincón infantil</span></div>
+  </div>
+</section>
+
+<!-- ============ VISÍTANOS / FOOTER ============ -->
+<footer id="visitanos">
+  <div class="colophon">
+    <div class="reveal">
+      <img src="C:\Users\USER16\Downloads\WhatsApp Image 2026-07-16 at 4.59.51 PM.jpeg" alt="Logo Café Literario" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin-bottom:16px;">
+      <h3>Café Literario</h3>
+      <p>Sírvete una historia. Café de autor y librería de barrio en el corazón de Chupaca, Junín.</p>
+    </div>
+    <div class="reveal">
+      <span class="col-label">Visítanos</span>
+      <address>
+        Jr. Real 234, Chupaca<br>
+        Junín, Perú
+      </address>
+      <p>Lun – Vie: 8:00 a.m. – 9:00 p.m.<br>Sáb – Dom: 9:00 a.m. – 10:00 p.m.</p>
+    </div>
+    <div class="reveal">
+      <span class="col-label">Conversemos</span>
+      <p><a href="tel:+51964000000">+51 964 000 000</a></p>
+      <p><a href="mailto:hola@cafeliterario.pe">hola@cafeliterario.pe</a></p>
+      <p><a href="#">Instagram</a> · <a href="#">Facebook</a></p>
+    </div>
+  </div>
+  <div class="imprint">
+    <span>Primera edición digital — Chupaca, Junín, Perú, 2026</span>
+    <span>© Café Literario — todos los derechos reservados</span>
+  </div>
+</footer>
+
+<script>
+  // Scroll-reveal for sections
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+
+  // Smooth anchor scroll offset (accounts for fixed top mark)
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e){
+      const id = this.getAttribute('href').slice(1);
+      const target = document.getElementById(id);
+      if(target){
+        e.preventDefault();
+        const y = target.getBoundingClientRect().top + window.pageYOffset - 20;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
